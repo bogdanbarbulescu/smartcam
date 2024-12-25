@@ -17,7 +17,6 @@ if (getUserMediaSupported()) {
   console.warn('getUserMedia() is not supported by your browser');
 }
 
-// Placeholder function for next step. Paste over this in the next step.
 // Enable the live webcam view and start classification.
 function enableCam(event) {
   // Only continue if the COCO-SSD has finished loading.
@@ -58,7 +57,7 @@ function predictWebcam() {
     // Now let's loop through predictions and draw them to the live view if
     // they have a high confidence score.
     for (let n = 0; n < predictions.length; n++) {
-      // If we are over 66% sure we are sure we classified it right, draw it!
+      // If we are over 66% sure we classified it right, draw it!
       if (predictions[n].score > 0.66) {
         const p = document.createElement('p');
         p.innerText = predictions[n].class + ' - with ' 
