@@ -5,8 +5,7 @@ const enableWebcamButton = document.getElementById('webcamButton');
 
 // Check if webcam access is supported.
 function getUserMediaSupported() {
-  return !!(navigator.mediaDevices &&
-    navigator.mediaDevices.getUserMedia);
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 }
 
 // If webcam supported, add event listener to button for when user
@@ -25,17 +24,21 @@ function enableCam(event) {
   if (!model) {
     return;
   }
-  
+
   // Hide the button once clicked.
-  event.target.classList.add('removed');  
-  
-  // getUsermedia parameters to force video but not audio.
+  event.target.classList.add('removed');
+
+  // getUsermedia parameters to force video (back camera) but not audio.
   const constraints = {
-    video: true
+    video: {
+      facingMode: 'environment', // Request the back camera
+      width: { ideal: 1280 },    // Ideal width
+      height: { ideal: 720 }     // Ideal height
+    }
   };
 
   // Activate the webcam stream.
-  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+  navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
     video.srcObject = stream;
     video.addEventListener('loadeddata', predictWebcam);
   });
@@ -51,14 +54,14 @@ function predictWebcam() {
       liveView.removeChild(children[i]);
     }
     children.splice(0);
-    
-    // Now lets loop through predictions and draw them to the live view if
+
+    // Now let's loop through predictions and draw them to the live view if
     // they have a high confidence score.
     for (let n = 0; n < predictions.length; n++) {
       // If we are over 66% sure we are sure we classified it right, draw it!
       if (predictions[n].score > 0.66) {
         const p = document.createElement('p');
-        p.innerText = predictions[n].class  + ' - with ' 
+        p.innerText = predictions[n].class + ' - with ' 
             + Math.round(parseFloat(predictions[n].score) * 100) 
             + '% confidence.';
         p.style = 'margin-left: ' + predictions[n].bbox[0] + 'px; margin-top: '
@@ -78,12 +81,11 @@ function predictWebcam() {
         children.push(p);
       }
     }
-    
+
     // Call this function again to keep predicting when the browser is ready.
     window.requestAnimationFrame(predictWebcam);
   });
 }
-
 
 demosSection.classList.remove('invisible');
 // Store the resulting model in the global scope of our app.
