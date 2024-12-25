@@ -3,6 +3,10 @@ const liveView = document.getElementById('liveView');
 const demosSection = document.getElementById('demos');
 const enableWebcamButton = document.getElementById('webcamButton');
 const captureButton = document.getElementById('captureButton');
+const flashlightButton = document.getElementById('flashlightButton');
+const downloadButton = document.getElementById('downloadButton');
+let flashlightActive = false;
+let currentCamera = 'environment'; // Default to back camera
 
 // Check if webcam access is supported.
 function getUserMediaSupported() {
@@ -28,11 +32,13 @@ function enableCam(event) {
   // Hide the button once clicked.
   event.target.classList.add('removed');
   captureButton.style.display = 'block';
+  flashlightButton.style.display = 'block';
+  downloadButton.style.display = 'block';
 
   // getUsermedia parameters to force video (back camera) but not audio.
   const constraints = {
     video: {
-      facingMode: 'environment', // Request the back camera
+      facingMode: currentCamera, // Use the current camera (back/front)
       width: { ideal: 1280 },    // Ideal width
       height: { ideal: 720 }     // Ideal height
     }
@@ -118,6 +124,26 @@ captureButton.addEventListener('click', function() {
   link.download = 'object-detection.png';
   link.click();
 });
+
+// Toggle flashlight on/off
+flashlightButton.addEventListener('click', function() {
+  flashlightActive = !flashlightActive;
+  const videoTrack = video.srcObject.getVideoTracks()[0];
+
+  if (videoTrack && videoTrack.getCapabilities().torch) {
+    videoTrack.applyConstraints({
+      advanced: [{ torch: flashlightActive }]
+    }).then(() => {
+      flashlightButton.innerText = flashlightActive ? 'Turn Flashlight Off' : 'Turn Flashlight On';
+    }).catch(err => console.error('Error toggling flashlight:', err));
+  }
+});
+
+// Switch between 3x/1x camera
+function switchCamera() {
+  currentCamera = currentCamera === 'environment' ? 'user' : 'environment'; // Switch between front/back camera
+  enableCam({ target: enableWebcamButton }); // Restart webcam with new camera
+}
 
 demosSection.classList.remove('invisible');
 // Store the resulting model in the global scope of our app.
