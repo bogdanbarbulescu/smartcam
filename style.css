@@ -11,7 +11,10 @@ body {
   
   video {
     display: block;
+    width: 100%; /* Full width */
+    height: auto; /* Maintain aspect ratio */
   }
+
   
   section {
     opacity: 1;
