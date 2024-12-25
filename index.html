@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Multiple object detection using pre trained model in TensorFlow.js</title>
     <meta charset="utf-8">
-    <!-- Import the webpage's stylesheet -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection with TensorFlow.js</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
-  </head>  
-  <body>
-    <h1>Multiple object detection using pre trained model in TensorFlow.js</h1>
+  </head>
+  <body class="bg-dark text-light">
+    <div class="container py-5">
+      <h1 class="text-center text-warning mb-4">Object Detection with TensorFlow.js</h1>
+      <p class="text-center">Click the button below to start detecting objects with your webcam.</p>
 
-    <p>Wait for the model to load before clicking the button to enable the webcam - at which point it will become visible to use.</p>
-    
-    <section id="demos" class="invisible">
+      <section id="demos" class="invisible">
+        <div id="liveView" class="camView">
+          <button id="webcamButton" class="btn btn-warning w-100">Start Detecting</button>
+          <video id="webcam" autoplay muted width="640" height="480" class="w-100 mt-3"></video>
+        </div>
+      </section>
+    </div>
 
-      <p>Hold some objects up close to your webcam to get a real-time classification! When ready click "enable webcam" below and accept access to the webcam when the browser asks (check the top left of your window)</p>
-      
-      <div id="liveView" class="camView">
-        <button id="webcamButton">Enable Webcam</button>
-        <video id="webcam" autoplay muted width="640" height="480"></video>
-      </div>
-    </section>
-
-    <!-- Import TensorFlow.js library -->
+    <!-- Import TensorFlow.js and Coco-SSD model -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js" type="text/javascript"></script>
-    <!-- Load the coco-ssd model to use to recognize things in images -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
     
-    <!-- Import the page's JavaScript to do some stuff -->
+    <!-- Custom JavaScript -->
     <script src="script.js" defer></script>
+
+    <!-- Bootstrap JS (optional for Bootstrap components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
