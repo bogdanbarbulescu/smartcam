@@ -2,6 +2,7 @@ const video = document.getElementById('webcam');
 const liveView = document.getElementById('liveView');
 const demosSection = document.getElementById('demos');
 const enableWebcamButton = document.getElementById('webcamButton');
+const captureButton = document.getElementById('captureButton');
 
 // Check if webcam access is supported.
 function getUserMediaSupported() {
@@ -26,6 +27,7 @@ function enableCam(event) {
 
   // Hide the button once clicked.
   event.target.classList.add('removed');
+  captureButton.style.display = 'block';
 
   // getUsermedia parameters to force video (back camera) but not audio.
   const constraints = {
@@ -48,16 +50,15 @@ var children = [];
 function predictWebcam() {
   // Now let's start classifying a frame in the stream.
   model.detect(video).then(function (predictions) {
-    // Remove any highlighting we did previous frame.
+    // Remove any previous bounding box highlights.
     for (let i = 0; i < children.length; i++) {
       liveView.removeChild(children[i]);
     }
     children.splice(0);
 
-    // Now let's loop through predictions and draw them to the live view if
-    // they have a high confidence score.
+    // Loop through predictions and draw bounding boxes if confidence is high.
     for (let n = 0; n < predictions.length; n++) {
-      // If we are over 66% sure we classified it right, draw it!
+      // If the prediction confidence is greater than 66%, draw it
       if (predictions[n].score > 0.66) {
         const p = document.createElement('p');
         p.innerText = predictions[n].class + ' - with ' 
@@ -86,17 +87,45 @@ function predictWebcam() {
   });
 }
 
+// Capture button functionality to download the image with bounding boxes
+captureButton.addEventListener('click', function() {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  
+  // Set canvas size to match the video feed
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  
+  // Draw the current video frame onto the canvas
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  // Draw the bounding boxes and labels on the canvas
+  children.forEach(function(child, index) {
+    const p = child.previousSibling;
+    const bbox = child.style;
+    context.beginPath();
+    context.rect(parseFloat(bbox.left), parseFloat(bbox.top), parseFloat(bbox.width), parseFloat(bbox.height));
+    context.lineWidth = 2;
+    context.strokeStyle = 'red';
+    context.fillStyle = 'red';
+    context.stroke();
+    context.fillText(p.innerText, parseFloat(bbox.left), parseFloat(bbox.top) - 10);
+  });
+
+  // Create a download link for the image
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/png');
+  link.download = 'object-detection.png';
+  link.click();
+});
+
 demosSection.classList.remove('invisible');
 // Store the resulting model in the global scope of our app.
 var model = undefined;
 
-// Before we can use COCO-SSD class we must wait for it to finish
-// loading. Machine Learning models can be large and take a moment 
-// to get everything needed to run.
-// Note: cocoSsd is an external object loaded from our index.html
-// script tag import so ignore any warning in Glitch.
+// Load the COCO-SSD model.
 cocoSsd.load().then(function (loadedModel) {
   model = loadedModel;
-  // Show demo section now model is ready to use.
+  // Show demo section once the model is ready to use.
   demosSection.classList.remove('invisible');
 });
