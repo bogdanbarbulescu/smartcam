@@ -1,54 +1,67 @@
+/* General styling */
 body {
-    font-family: helvetica, arial, sans-serif;
-    margin: 2em;
-    color: #3D3D3D;
-  }
-  
-  h1 {
-    font-style: italic;
-    color: #FF6F00;
-  }
-  
-  video {
-    display: block;
-    width: 100%; /* Full width */
-    height: auto; /* Maintain aspect ratio */
-  }
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  margin: 0;
+}
 
-  
-  section {
-    opacity: 1;
-    transition: opacity 500ms ease-in-out;
-  }
-  .removed {
-    display: none;
-  }
-  
-  .invisible {
-    opacity: 0.2;
-  }
-  
-  .camView {
-    position: relative;
-    float: left;
-    width: calc(100% - 20px);
-    margin: 10px;
-    cursor: pointer;
-  }
-  
-  .camView p {
-    position: absolute;
-    padding: 5px;
-    background-color: rgba(255, 111, 0, 0.85);
-    color: #FFF;
-    border: 1px dashed rgba(255, 255, 255, 0.7);
-    z-index: 2;
-    font-size: 12px;
-  }
-  
-  .highlighter {
-    background: rgba(0, 255, 0, 0.25);
-    border: 1px dashed #fff;
-    z-index: 1;
-    position: absolute;
-  }
+h1 {
+  font-style: italic;
+}
+
+.camView {
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+section {
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+}
+
+.invisible {
+  opacity: 0.2;
+}
+
+/* Text Styling */
+p {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.highlighter {
+  background: rgba(0, 255, 0, 0.25);
+  border: 1px dashed #fff;
+  z-index: 1;
+  position: absolute;
+}
+
+#liveView p {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  margin: 0;
+  position: absolute;
+}
+
+#webcamButton {
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+/* Adjusting the appearance of the bounding box text */
+#liveView p {
+  font-size: 20px; /* Increase the font size for bounding box text */
+}
+
+#webcamButton:hover {
+  background-color: #ffb74d;
+}
