@@ -4,36 +4,30 @@ const demosSection = document.getElementById('demos');
 const enableWebcamButton = document.getElementById('webcamButton');
 const captureButton = document.getElementById('captureButton');
 const flashlightButton = document.getElementById('flashlightButton');
-const downloadButton = document.getElementById('downloadButton');
 let flashlightActive = false;
 let currentCamera = 'environment'; // Default to back camera
+let isDetecting = false;  // Track if detection is active
+let predictions = [];  // Store predictions for use when capturing the image
 
 // Check if webcam access is supported.
 function getUserMediaSupported() {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 }
 
-// If webcam supported, add event listener to button for when user
-// wants to activate it to call enableCam function which we will 
-// define in the next step.
-if (getUserMediaSupported()) {
-  enableWebcamButton.addEventListener('click', enableCam);
-} else {
-  console.warn('getUserMedia() is not supported by your browser');
+// Toggle detection mode
+function toggleDetection() {
+  if (isDetecting) {
+    stopDetection();
+  } else {
+    startDetection();
+  }
 }
 
-// Enable the live webcam view and start classification.
-function enableCam(event) {
-  // Only continue if the COCO-SSD has finished loading.
-  if (!model) {
-    return;
-  }
-
-  // Hide the button once clicked.
-  event.target.classList.add('removed');
+function startDetection() {
+  isDetecting = true;
+  enableWebcamButton.innerText = "Stop Detecting";
   captureButton.style.display = 'block';
   flashlightButton.style.display = 'block';
-  downloadButton.style.display = 'block';
 
   // getUsermedia parameters to force video (back camera) but not audio.
   const constraints = {
@@ -51,20 +45,28 @@ function enableCam(event) {
   });
 }
 
-var children = [];
+function stopDetection() {
+  isDetecting = false;
+  enableWebcamButton.innerText = "Start Detecting";
+  captureButton.style.display = 'none';
+  flashlightButton.style.display = 'none';
+
+  // Stop the webcam stream.
+  const stream = video.srcObject;
+  const tracks = stream.getTracks();
+  tracks.forEach(track => track.stop());
+  video.srcObject = null;
+}
 
 function predictWebcam() {
   // Now let's start classifying a frame in the stream.
-  model.detect(video).then(function (predictions) {
-    // Remove any previous bounding box highlights.
-    for (let i = 0; i < children.length; i++) {
-      liveView.removeChild(children[i]);
-    }
-    children.splice(0);
+  model.detect(video).then(function (predictionsResult) {
+    predictions = predictionsResult;  // Store predictions for use when capturing
 
     // Loop through predictions and draw bounding boxes if confidence is high.
+    liveView.innerHTML = '';  // Clear previous predictions
+
     for (let n = 0; n < predictions.length; n++) {
-      // If the prediction confidence is greater than 66%, draw it
       if (predictions[n].score > 0.66) {
         const p = document.createElement('p');
         p.innerText = predictions[n].class + ' - with ' 
@@ -83,17 +85,17 @@ function predictWebcam() {
 
         liveView.appendChild(highlighter);
         liveView.appendChild(p);
-        children.push(highlighter);
-        children.push(p);
       }
     }
 
     // Call this function again to keep predicting when the browser is ready.
-    window.requestAnimationFrame(predictWebcam);
+    if (isDetecting) {
+      window.requestAnimationFrame(predictWebcam);
+    }
   });
 }
 
-// Capture button functionality to download the image with bounding boxes
+// Capture button functionality to save the image with bounding boxes
 captureButton.addEventListener('click', function() {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -106,16 +108,17 @@ captureButton.addEventListener('click', function() {
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
   // Draw the bounding boxes and labels on the canvas
-  children.forEach(function(child, index) {
-    const p = child.previousSibling;
-    const bbox = child.style;
-    context.beginPath();
-    context.rect(parseFloat(bbox.left), parseFloat(bbox.top), parseFloat(bbox.width), parseFloat(bbox.height));
-    context.lineWidth = 2;
-    context.strokeStyle = 'red';
-    context.fillStyle = 'red';
-    context.stroke();
-    context.fillText(p.innerText, parseFloat(bbox.left), parseFloat(bbox.top) - 10);
+  predictions.forEach(function(prediction) {
+    if (prediction.score > 0.66) {
+      const bbox = prediction.bbox;
+      context.beginPath();
+      context.rect(bbox[0], bbox[1], bbox[2], bbox[3]);
+      context.lineWidth = 2;
+      context.strokeStyle = 'red';
+      context.fillStyle = 'red';
+      context.stroke();
+      context.fillText(prediction.class, bbox[0], bbox[1] - 10);
+    }
   });
 
   // Create a download link for the image
@@ -142,7 +145,10 @@ flashlightButton.addEventListener('click', function() {
 // Switch between 3x/1x camera
 function switchCamera() {
   currentCamera = currentCamera === 'environment' ? 'user' : 'environment'; // Switch between front/back camera
-  enableCam({ target: enableWebcamButton }); // Restart webcam with new camera
+  if (isDetecting) {
+    stopDetection();
+    startDetection(); // Restart webcam with new camera
+  }
 }
 
 demosSection.classList.remove('invisible');
