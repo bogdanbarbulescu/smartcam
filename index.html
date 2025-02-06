@@ -11,22 +11,23 @@
     <div class="container text-center mt-4">
       <h1 class="text-warning fw-bold">Object Detection with TensorFlow.js</h1>
       <p>Click the button below to start detecting objects with your webcam.</p>
-      
+
       <div class="mb-3">
         <button id="toggleDetection" class="btn btn-warning fw-bold">Start Detecting</button>
-        <button id="captureImage" class="btn btn-success fw-bold">Capture Image</button>
-        <button id="toggleFlashlight" class="btn btn-danger fw-bold">Turn Flashlight On</button>
-      </div>
-      
+        <button id="captureImage" class="btn btn-success fw-bold" style="display: none;">Capture Image</button>
+        <button id="toggleFlashlight" class="btn btn-danger fw-bold" style="display:none;">Turn Flashlight On</button>
+        <button id="switchCamera" class="btn btn-info fw-bold" style="display:none;">Switch Camera</button>
+       </div>
+
       <div id="liveView" class="camView">
         <video id="webcam" autoplay muted playsinline class="border border-light"></video>
       </div>
-      
-      <div id="capturedImageContainer">
+
+      <div id="capturedImageContainer" style="display:none;">  <!-- Initially hidden -->
         <img id="capturedImage" alt="Captured Image" />
       </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
     <script src="script.js"></script>
