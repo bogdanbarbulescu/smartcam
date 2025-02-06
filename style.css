@@ -12,22 +12,19 @@ h1 {
   position: relative;
   width: 100%;
   margin: 0;
+    display: flex; /* Make it a flex container */
+  justify-content: center; /* Center horizontally */
 }
 
 video {
   display: block;
-  width: 100%;
+    /* Removed width: 100%; */
   height: auto;
+    max-width: 100%;  /* Add this to make it responsive */
+    max-height: 80vh; /* Adjust as needed */
+
 }
 
-section {
-  opacity: 1;
-  transition: opacity 500ms ease-in-out;
-}
-
-.invisible {
-  opacity: 0.2;
-}
 
 /* Text Styling */
 p {
@@ -51,17 +48,23 @@ p {
   position: absolute;
 }
 
-#webcamButton {
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 5px;
-}
-
 /* Adjusting the appearance of the bounding box text */
 #liveView p {
   font-size: 20px; /* Increase the font size for bounding box text */
 }
 
-#webcamButton:hover {
-  background-color: #ffb74d;
+/* Button hover effect */
+.btn:hover {
+  opacity: 0.8; /* Slightly dim on hover */
+}
+
+#capturedImageContainer {
+    margin-top: 20px; /* Add some space above the captured image */
+}
+
+#capturedImage {
+    max-width: 100%; /* Ensure the image fits within its container */
+    height: auto;    /* Maintain aspect ratio */
+    border: 2px solid white; /* Optional: Add a border */
+
 }
